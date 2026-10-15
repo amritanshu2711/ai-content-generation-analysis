@@ -1,0 +1,163 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Content Studio</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
+</head>
+
+        </head>
+<body>
+    <main class="container">
+        <header class="hero">
+            <p class="eyebrow">AI-POWERED CONTENT GENERATION</p>
+            <h1>AI Content Studio</h1>
+            <p>
+                Turn your ideas into useful content with the power of AI.
+            </p>
+        </header>
+
+        <section class="panel">
+            <h2>Create your content</h2>
+
+            <form method="POST">
+                <label for="topic">Topic or idea</label>
+                <textarea
+                    id="topic"
+                    name="topic"
+                    rows="4"
+                    maxlength="500"
+                    placeholder="Example: Benefits of learning Python"
+                    required>{{ topic }}</textarea>
+
+                <div class="form-grid">
+                    <div>
+                        <label for="content_type">Content type</label>
+                        <select id="content_type" name="content_type">
+                            <option value="Blog Post"
+                                {% if content_type == "Blog Post" %}selected{% endif %}>
+                                Blog Post
+                            </option>
+                            <option value="Social Media Caption"
+                                {% if content_type == "Social Media Caption" %}selected{% endif %}>
+                                Social Media Caption
+                            </option>
+                            <option value="Product Description"
+                                {% if content_type == "Product Description" %}selected{% endif %}>
+                                Product Description
+                            </option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="tone">Writing tone</label>
+                        <select id="tone" name="tone">
+                            <option value="Professional"
+                                {% if tone == "Professional" %}selected{% endif %}>
+                                Professional
+                            </option>
+                            <option value="Friendly"
+                                {% if tone == "Friendly" %}selected{% endif %}>
+                                Friendly
+                            </option>
+                            <option value="Creative"
+                                {% if tone == "Creative" %}selected{% endif %}>
+                                Creative
+                            </option>
+                            <option value="Simple"
+                                {% if tone == "Simple" %}selected{% endif %}>
+                                Simple
+                            </option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="length">Content length</label>
+                        <select id="length" name="length">
+                            <option value="Short"
+                                {% if length == "Short" %}selected{% endif %}>
+                                Short
+                            </option>
+                            <option value="Medium"
+                                {% if length == "Medium" %}selected{% endif %}>
+                                Medium
+                            </option>
+                            <option value="Long"
+                                {% if length == "Long" %}selected{% endif %}>
+                                Long
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit">Generate Content</button>
+            </form>
+        </section>
+
+        {% if error_message %}
+        <section class="message error" role="alert">
+            {{ error_message }}
+        </section>
+        {% endif %}
+
+        {% if generated_content %}
+        <section class="panel result">
+            <div class="result-heading">
+                <h2>Generated Content</h2>
+                <button type="button" class="copy-button"
+                        onclick="copyContent()">
+                    Copy content
+                </button>
+            </div>
+
+           <div id="generatedContent" class="markdown-content">{{ generated_content }}</div>
+            <p id="copyStatus" class="copy-status" aria-live="polite"></p>
+        </section>
+        {% endif %}
+
+        <footer>
+            <p>AI-Powered Content Generation &amp; Analysis Platform</p>
+            <p>Prototype project · EduSkills Virtual Internship</p>
+        </footer>
+    </main>
+
+    <script>        
+function renderGeneratedContent() {
+    const contentElement = document.getElementById("generatedContent");
+
+    if (!contentElement) return;
+
+    const markdown = contentElement.textContent;
+
+    if (typeof marked === "undefined" ||
+        typeof DOMPurify === "undefined") {
+        return;
+    }
+
+    const html = marked.parse(markdown);
+    contentElement.innerHTML = DOMPurify.sanitize(html);
+}
+
+document.addEventListener("DOMContentLoaded", renderGeneratedContent);
+
+        async function copyContent() {
+            const content = document.getElementById("generatedContent").innerText;
+            const status = document.getElementById("copyStatus");
+
+            try {
+                await navigator.clipboard.writeText(content);
+                status.textContent = "Content copied!";
+            } catch (error) {
+                status.textContent =
+                    "Copy unavailable. Please select and copy the text manually.";
+            }
+        }
+    </script>
+</body>
+</html>
